@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-// ย้าย class ออกมาไว้ด้านนอก
 class _SummaryCardInfo {
   final String title;
   final int count;
@@ -24,7 +23,7 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
   // Constants
   static const Duration _cacheDuration = Duration(hours: 24);
   static const String _apiUrl =
-      'https://script.google.com/macros/s/AKfycbyf9Tun6tLW4miFxLXIMqGjUkolFA6Md_fcGJ_HdP_EUjIH_XMRiQYKIYMe4ROD_wNo/exec';
+      'https://script.google.com/macros/s/AKfycbyK0vExuquR9feW5pb3I7h288YLvaWRGGKR44ev_FsxBjpoY7ivH-MlgcJPGizp_hAP/exec';
 
   // Variables
   late Future<List<dynamic>> _futureData;
@@ -266,20 +265,25 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
       Colors.purple[400]!,
     ];
 
-    return machineMap.entries.map((entry) {
-      final index = machineMap.keys.toList().indexOf(entry.key);
+    // Top 5
+    final sortedEntries = machineMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final top5 = sortedEntries.take(5).toList();
+
+    return List.generate(top5.length, (i) {
+      final entry = top5[i];
       return BarChartGroupData(
-        x: index,
+        x: i,
         barRods: [
           BarChartRodData(
             toY: entry.value.toDouble(),
-            color: colors[index % colors.length],
+            color: colors[i % colors.length],
             width: 20,
             borderRadius: BorderRadius.circular(4),
           ),
         ],
       );
-    }).toList();
+    });
   }
 
   List<BarChartGroupData> _getTechnicianBarData(Map<String, int> techMap) {
@@ -291,20 +295,25 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
       Colors.deepOrange[400]!,
     ];
 
-    return techMap.entries.map((entry) {
-      final index = techMap.keys.toList().indexOf(entry.key);
+    // Top 5
+    final sortedEntries = techMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final top5 = sortedEntries.take(5).toList();
+
+    return List.generate(top5.length, (i) {
+      final entry = top5[i];
       return BarChartGroupData(
-        x: index,
+        x: i,
         barRods: [
           BarChartRodData(
             toY: entry.value.toDouble(),
-            color: colors[index % colors.length],
+            color: colors[i % colors.length],
             width: 20,
             borderRadius: BorderRadius.circular(4),
           ),
         ],
       );
-    }).toList();
+    });
   }
 
   // Utility methods
@@ -541,7 +550,7 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
                         children: [
                           Expanded(
                             child: Text(
-                              'เครื่องจักรที่มีการซ่อมบ่อยที่สุด',
+                              'เครื่องจักรที่มีการซ่อมบ่อยที่สุด 5 อันดับแรก',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -645,7 +654,7 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
                   children: [
                           Expanded(
                             child: Text(
-                              'ช่างที่มีงานซ่อมมากที่สุด',
+                              'ช่างที่มีงานซ่อมมากที่สุด 5 อันดับแรก',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -1198,7 +1207,7 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
                     Text(
-                      'เครื่องจักรที่มีการซ่อมบ่อยที่สุด',
+                      'เครื่องจักรที่มีการซ่อมบ่อยที่สุด 5 อันดับแรก',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1295,7 +1304,10 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
                       ),
                     ),
                     SizedBox(height: 12),
-                    ...machineMap.entries.map((entry) => _buildMachineListItem(entry.key, entry.value)),
+                    ...((machineMap.entries.toList()
+                      ..sort((a, b) => b.value.compareTo(a.value)))
+                      .map((entry) => _buildMachineListItem(entry.key, entry.value))
+                      .toList()),
                   ],
                 ),
               ),
@@ -1471,7 +1483,7 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
                   crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                      'ช่างที่มีงานซ่อมมากที่สุด',
+                      'ช่างที่มีงานซ่อมมากที่สุด 5 อันดับแรก',
                   style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1566,7 +1578,10 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
                       ),
                     ),
                     SizedBox(height: 12),
-                    ...techMap.entries.map((entry) => _buildTechnicianListItem(entry.key, entry.value)),
+                    ...((techMap.entries.toList()
+                      ..sort((a, b) => b.value.compareTo(a.value)))
+                      .map((entry) => _buildTechnicianListItem(entry.key, entry.value))
+                      .toList()),
                             ],
                           ),
                         ),

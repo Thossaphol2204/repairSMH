@@ -236,7 +236,7 @@ class _MainTechnicianTabScreenState extends State<MainTechnicianTabScreen> {
 
   final List<Widget> _tabs = [
     RepairTab(),
-    CustomerFeedbackTab(),
+    CustomerFeedbackTab(initialTabIndex: 1),
     WorkOrderOverviewScreen(),
     PMTab(),
     RepairSummaryTab(),

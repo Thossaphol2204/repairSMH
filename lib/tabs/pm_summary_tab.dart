@@ -22,7 +22,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
   };
   
   bool isLoading = true;
-  bool isRefreshing = false;
   DateTime? lastUpdate;
   List<dynamic> cachedData = [];
   DateTime? _lastFetchTime;
@@ -62,30 +61,27 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
         cachedData = json.decode(response.body);
         _processData(cachedData);
         _lastFetchTime = DateTime.now();
-        await _saveCache(cachedData); // save to cache
+        await _saveCache(cachedData);
       }
-    } catch (e) {
-      // print('Error fetching data: $e');
-    } finally {
+    } catch (e) {} 
+    finally {
       setState(() => isLoading = false);
     }
   }
 
   Future<void> _refreshData() async {
-    if (isRefreshing) return;
+    setState(() => isLoading = true);
     try {
-      setState(() => isRefreshing = true);
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200 || response.statusCode == 302) {
         cachedData = json.decode(response.body);
         _processData(cachedData);
         _lastFetchTime = DateTime.now();
-        await _saveCache(cachedData); // save to cache
+        await _saveCache(cachedData);
       }
-    } catch (e) {
-      // print('Error refreshing data: $e');
-    } finally {
-      setState(() => isRefreshing = false);
+    } catch (e) {} 
+    finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -122,22 +118,16 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
       value['notDue'] = 0;
       value['total'] = 0;
     });
-    
     final now = DateTime.now();
     final weekEnd = now.add(Duration(days: 7 - now.weekday));
-    
     for (var machine in data) {
       final zoneId = machine['ZoneID']?.toString().toUpperCase();
       final zoneKey = _getZoneKey(zoneId);
-      
       if (zoneKey != null) {
         zoneStats[zoneKey]!['total'] = (zoneStats[zoneKey]!['total'] ?? 0) + 1;
-        
         final nextCheck = _parseDate(machine['NextCheckDate']);
         final result = machine['ผลการตรวจ']?.toString().trim();
-        
         if (result == 'ผ่าน') {
-          // ไม่นับในสถานะ pending/thisWeek/notDue
         } else if (result == null || result.isEmpty ) {
           if (nextCheck != null) {
             if (nextCheck.isBefore(now)) {
@@ -152,7 +142,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
         }
       }
     }
-    
     setState(() {
       lastUpdate = DateTime.now();
     });
@@ -186,9 +175,7 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
         final timestamp = int.tryParse(value);
         if (timestamp != null) return DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
-    } catch (e) {
-      // print('Error parsing date: $value, error: $e');
-    }
+    } catch (e) {}
     return null;
   }
 
@@ -263,11 +250,9 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
     return failedMachines;
   }
 
-  // Add a helper function to format date strings as yyyy-MM-dd
   String _formatDate(String? dateStr) {
     if (dateStr == null || dateStr.trim().isEmpty) return '-';
     try {
-      // Try parsing as DateTime
       DateTime dt;
       if (dateStr.contains('-')) {
         dt = DateTime.parse(dateStr);
@@ -298,7 +283,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  // Header Card
                   Container(
                     width: double.infinity,
                     margin: EdgeInsets.all(16),
@@ -329,10 +313,21 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                                 fontFamily: 'Kanit',
                               ),
                             ),
-                            IconButton(
-                              icon: Icon(Icons.refresh),
-                              onPressed: _refreshData,
-                              color: Colors.blue.shade700,
+                            Material(
+                              color: Color(0xFFE3F0FF),
+                              shape: CircleBorder(),
+                              child: InkWell(
+                                customBorder: CircleBorder(),
+                                onTap: _refreshData,
+                                child: Padding(
+                                  padding: EdgeInsets.all(6),
+                                  child: Icon(
+                                    Icons.refresh,
+                                    color: Color(0xFF1976D2),
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -347,8 +342,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                       ],
                     ),
                   ),
-                  
-                  // Zone Summary Cards
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -361,7 +354,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                       final progress = stats['total']! > 0 
                           ? (completedCount / stats['total']!)
                           : 0.0;
-                      
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         padding: EdgeInsets.all(16),
@@ -412,8 +404,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                               ],
                             ),
                             SizedBox(height: 16),
-                            
-                            // ยังไม่ได้ตรวจเช็ค (จัดชิดซ้าย)
                             Text(
                               'ยังไม่ได้ตรวจเช็ค',
                               style: TextStyle(
@@ -424,8 +414,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                               ),
                             ),
                             Divider(color: Colors.grey.shade300, thickness: 1),
-                            
-                            // Status indicators
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 12),
                               child: Row(
@@ -437,8 +425,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                                 ],
                               ),
                             ),
-                            
-                            // ตรวจเช็คแล้ว (จัดชิดซ้าย)
                             SizedBox(height: 8),
                             Text(
                               'ตรวจเช็คแล้ว',
@@ -450,8 +436,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                               ),
                             ),
                             Divider(color: Colors.grey.shade300, thickness: 1),
-                            
-                            // Progress bar
                             Padding(
                               padding: EdgeInsets.only(top: 12),
                               child: Column(
@@ -483,8 +467,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
                                 ],
                               ),
                             ),
-                            
-                            // แสดงรายการเครื่องที่ไม่ผ่าน
                             if (_getFailedMachines(zoneName).isNotEmpty) ...[
                               SizedBox(height: 12),
                               GestureDetector(
@@ -613,7 +595,6 @@ class _PMSummaryTabState extends State<PMSummaryTab> {
   Widget _buildStatusIndicator(String status, int count) {
     final color = _getStatusColor(status);
     final text = _getStatusText(status);
-    
     return Column(
       children: [
         Container(

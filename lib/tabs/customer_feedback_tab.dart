@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'work_report_tab.dart';
 
 class CustomerFeedbackTab extends StatefulWidget {
+  final int initialTabIndex;
+  CustomerFeedbackTab({this.initialTabIndex = 0});
   @override
   _CustomerFeedbackTabState createState() => _CustomerFeedbackTabState();
 }
@@ -24,7 +26,7 @@ class _CustomerFeedbackTabState extends State<CustomerFeedbackTab>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTabIndex);
     _lastFetchTime = DateTime.now();
     _futureRepairs = _fetchRepairsWithCache();
   }

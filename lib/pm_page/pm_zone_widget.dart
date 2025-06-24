@@ -42,7 +42,7 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
     'ยังไม่ถึง'
   ];
 
-  final String apiUrl = 'https://script.google.com/macros/s/AKfycbwvfUY_5R2RNz9VrQYn-vaaH5vpVsbPBPA_h-Q0qQEwyQ_ErOjLjdS_bg3SFXo4N87a/exec';
+  final String apiUrl = 'https://script.google.com/macros/s/AKfycbyK0vExuquR9feW5pb3I7h288YLvaWRGGKR44ev_FsxBjpoY7ivH-MlgcJPGizp_hAP/exec';
 
   @override
   void initState() {
@@ -993,7 +993,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
           result['ผลการตรวจ $i'] = answers['$i']!;
         }
       }
-      final url = 'https://script.google.com/macros/s/AKfycbwN2FR1HCF-RbUF9FZUYQrtr3RcMSK8W-zrDJmcEU3AdmB7SlDcfM_NwjPhfCI1x-f4/exec';
+      final url = 'https://script.google.com/macros/s/AKfycbyK0vExuquR9feW5pb3I7h288YLvaWRGGKR44ev_FsxBjpoY7ivH-MlgcJPGizp_hAP/exec';
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},

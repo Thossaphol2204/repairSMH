@@ -1223,6 +1223,16 @@ class _WorkOrderTabState extends State<WorkOrderTab>
     List<String> otherTechnicians = allTechNames.where((name) => !assignedTechnicians.contains(name)).toList();
     List<MultiSelectItem<String>> otherTechItems = otherTechnicians.map((name) => MultiSelectItem<String>(name, name)).toList();
 
+    List<Map<String, String>> partsList = [];
+    final List<TextEditingController> partNameControllers = [];
+    final List<TextEditingController> partQtyControllers = [];
+    void addPartRow() {
+      partNameControllers.add(TextEditingController());
+      partQtyControllers.add(TextEditingController());
+    }
+    // เริ่มต้นมี 1 แถว
+    if (partNameControllers.isEmpty) addPartRow();
+
     await showDialog(
       context: context,
       builder: (context) {
@@ -1311,31 +1321,70 @@ class _WorkOrderTabState extends State<WorkOrderTab>
                       ),
                     ),
                     SizedBox(height: 6),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'อะไหล่ที่ใช้',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.blue),
+                    Column(
+                      children: List.generate(partNameControllers.length, (i) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: TextFormField(
+                                controller: partNameControllers[i],
+                                decoration: InputDecoration(
+                                  labelText: 'ชื่ออะไหล่',
+                                  labelStyle: TextStyle(fontSize: 13),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  suffixIcon: partNameControllers.length > 1
+                                    ? IconButton(
+                                        icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                        onPressed: () {
+                                          setState(() {
+                                            partNameControllers.removeAt(i);
+                                            partQtyControllers.removeAt(i);
+                                          });
+                                        },
+                                      )
+                                    : null,
+                                ),
+                                style: TextStyle(fontSize: 13),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: partQtyControllers[i],
+                                decoration: InputDecoration(
+                                  labelText: 'จำนวน',
+                                  labelStyle: TextStyle(fontSize: 13),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                ),
+                                keyboardType: TextInputType.number,
+                                style: TextStyle(fontSize: 13),
+                              ),
+                            ),
+                          ],
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.blue[200]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.blue[900]!, width: 2),
-                        ),
-                        hintText: 'ระบุอะไหล่ที่ใช้ในการซ่อม',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        filled: true,
-                        fillColor: Colors.blue[50],
-                      ),
-                      maxLines: 3,
-                      onChanged: (value) {
-                        partsUsed = value;
-                      },
+                      )),
                     ),
+                    SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.add),
+                        label: Text('เพิ่มแถวอะไหล่'),
+                        onPressed: () {
+                          setState(() {
+                            addPartRow();
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -1348,9 +1397,17 @@ class _WorkOrderTabState extends State<WorkOrderTab>
                   child: Text('ยืนยัน'),
                   onPressed: () async {
                     if (selectedTechnicians.isNotEmpty) {
+                      // รวมอะไหล่เป็นข้อความเดียว
+                      String partsText = List.generate(partNameControllers.length, (i) {
+                        final name = partNameControllers[i].text.trim();
+                        final qty = partQtyControllers[i].text.trim();
+                        if (name.isNotEmpty && qty.isNotEmpty) {
+                          return '$name x$qty';
+                        }
+                        return '';
+                      }).where((e) => e.isNotEmpty).join(', ');
                       // Close dialog immediately
                       Navigator.pop(context);
-                      
                       // Show loading indicator
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -1372,12 +1429,11 @@ class _WorkOrderTabState extends State<WorkOrderTab>
                           duration: Duration(seconds: 2),
                         ),
                       );
-                      
                       // Perform API call in background
                       _completeWorkOrder(
                         order,
                         selectedTechnicians,
-                        partsUsed,
+                        partsText,
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
