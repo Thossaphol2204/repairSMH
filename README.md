@@ -15,15 +15,14 @@
 
 ```
 lib/
-├── main.dart                  # Entry point ของแอป
-├── constants.dart             # ค่าคงที่ที่ใช้ร่วมกัน
-├── components/                # (ลบแล้ว)
-├── screens/                   # หน้าจอหลัก เช่น about, bug report, role selection, work order overview
+├── main.dart                  
+├── constants.dart             
+├── screens/                  
 │   ├── about_screen.dart
 │   ├── bug_report_screen.dart
 │   ├── role_selection_screen.dart
 │   ├── work_order_overview_screen.dart
-├── tabs/                      # Tab หลักของแอป (แต่ละฟีเจอร์)
+├── tabs/                     
 │   ├── repair_tab.dart
 │   ├── customer_feedback_tab.dart
 │   ├── work_order_tab.dart
@@ -31,7 +30,7 @@ lib/
 │   ├── repair_summary_tab.dart
 │   ├── pm_summary_tab.dart
 │   └── work_report_tab.dart
-├── pm_page/                   # หน้า PM แยกตามโซน
+├── pm_page/                
 │   ├── pm_zone_widget.dart
 │   ├── zone1.dart
 │   ├── zone2.dart
@@ -39,7 +38,7 @@ lib/
 │   ├── zone4.dart
 │   └── zone5.dart
 assets/
-└── icon/                      # โลโก้และไอคอน
+└── icon/                     
     └── logo_SMH.png
 ```
 ## 🛠️ วิธีติดตั้งและรันโปรเจกต์ (Step by Step)
