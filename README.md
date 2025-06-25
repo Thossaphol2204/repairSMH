@@ -50,7 +50,7 @@ assets/
 ### 2. Clone โปรเจกต์จาก GitHub
 ```sh
 # เปลี่ยน URL ให้ตรงกับ repo ของคุณ
- git clone https://github.com/yourusername/repair-app.git
+ git clone https://github.com/Thossaphol2204/repairSMH.git
  cd repair-app
 ```
 
