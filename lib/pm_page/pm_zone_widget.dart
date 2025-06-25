@@ -42,7 +42,7 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
     'ยังไม่ถึง'
   ];
 
-  final String apiUrl = 'https://script.google.com/macros/s/AKfycbyK0vExuquR9feW5pb3I7h288YLvaWRGGKR44ev_FsxBjpoY7ivH-MlgcJPGizp_hAP/exec';
+  final String apiUrl = 'https://script.google.com/macros/s/AKfycbxD44J2_elf6REnwP9n8o6-ZITPDPYiMSKYeWdmbThQxDbIHU3-2Me619aPX6uhc9Bl/exec';
 
   @override
   void initState() {
@@ -75,6 +75,7 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
                 .where((m) => m['ZoneID']?.toString().toUpperCase() == widget.zoneId || 
                               m['ZoneID']?.toString() == widget.zoneNumber)
                 .toList();
+            resetStatusIfNearNextCheck(machines);
             lastUpdate = _lastFetchTime;
             isInitialLoad = false;
           });
@@ -106,6 +107,7 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
         
         setState(() {
           machines = newMachines;
+          resetStatusIfNearNextCheck(machines);
           lastUpdate = DateTime.now();
           isInitialLoad = false;
         });
@@ -384,26 +386,52 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
             ],
           ),
           SizedBox(height: 8),
-          Stack(
+          Row(
             children: [
-              LinearProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                minHeight: 10,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              if (failedCount > 0)
-                Positioned(
-                  right: 0,
+              if (passedCount > 0)
+                Expanded(
+                  flex: passedCount,
                   child: Container(
-                    width: (1 - progress) * MediaQuery.of(context).size.width * 0.8,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        bottomLeft: Radius.circular(5),
+                        topRight: (machines.length - passedCount - failedCount == 0 && failedCount == 0)
+                            ? Radius.circular(5)
+                            : Radius.zero,
+                        bottomRight: (machines.length - passedCount - failedCount == 0 && failedCount == 0)
+                            ? Radius.circular(5)
+                            : Radius.zero,
+                      ),
+                    ),
+                  ),
+                ),
+              if (machines.length - passedCount - failedCount > 0)
+                Expanded(
+                  flex: machines.length - passedCount - failedCount,
+                  child: Container(
+                    height: 10,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+              if (failedCount > 0)
+                Expanded(
+                  flex: failedCount,
+                  child: Container(
                     height: 10,
                     decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(5),
                         bottomRight: Radius.circular(5),
+                        topLeft: (passedCount == 0 && machines.length - passedCount - failedCount == 0)
+                            ? Radius.circular(5)
+                            : Radius.zero,
+                        bottomLeft: (passedCount == 0 && machines.length - passedCount - failedCount == 0)
+                            ? Radius.circular(5)
+                            : Radius.zero,
                       ),
                     ),
                   ),
@@ -729,6 +757,51 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
     }
   }
 
+  Future<void> updateResetStatus(Map<String, dynamic> machine) async {
+    final url = 'https://script.google.com/macros/s/AKfycbxD44J2_elf6REnwP9n8o6-ZITPDPYiMSKYeWdmbThQxDbIHU3-2Me619aPX6uhc9Bl/exec';
+    final resetData = {
+      'action': 'reset',
+      'MachineID': machine['MachineID'],
+      'ผลการตรวจ': '',
+      'ผู้ตรวจ': '',
+      'เวลาที่ตรวจ': '',
+      'รายละเอียดการตรวจ': '',
+      'รายละเอียด / อะไหล่': '',
+    };
+    try {
+      await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(resetData),
+      );
+    } catch (e) {
+      // ไม่ต้องแจ้ง error เพื่อกันแอปล่ม
+    }
+  }
+
+  void resetStatusIfNearNextCheck(List<Map<String, dynamic>> machines) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    for (var m in machines) {
+      final result = m['ผลการตรวจ']?.toString();
+      final nextCheckDate = _parseDate(m['NextCheckDate']);
+      if (result == 'ผ่าน' && nextCheckDate != null) {
+        final nextDate = DateTime(nextCheckDate.year, nextCheckDate.month, nextCheckDate.day);
+        final diff = nextDate.difference(today).inDays;
+        print('Machine: \\${m['MachineID']}, today: \\$today, next: \\$nextDate, diff: \\$diff');
+        if (diff == 2) {
+          print('Reset: \\${m['MachineID']}');
+          m['ผลการตรวจ'] = '';
+          m['ผู้ตรวจ'] = '';
+          m['เวลาที่ตรวจ'] = '';
+          m['รายละเอียดการตรวจ'] = '';
+          m['รายละเอียด / อะไหล่'] = '';
+          updateResetStatus(m);
+        }
+      }
+    }
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -993,12 +1066,36 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
           result['ผลการตรวจ $i'] = answers['$i']!;
         }
       }
-      final url = 'https://script.google.com/macros/s/AKfycbyK0vExuquR9feW5pb3I7h288YLvaWRGGKR44ev_FsxBjpoY7ivH-MlgcJPGizp_hAP/exec';
+      final url = 'https://script.google.com/macros/s/AKfycbxD44J2_elf6REnwP9n8o6-ZITPDPYiMSKYeWdmbThQxDbIHU3-2Me619aPX6uhc9Bl/exec';
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(result),
       );
+      try {
+        final now = DateTime.now();
+        final monthNames = [
+          '', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+          'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+        ];
+        final monthName = monthNames[now.month];
+        final suffix = now.day < 16 ? '_1' : '_16';
+        final targetColumn = '$monthName$suffix';
+        final historyString = '${now.day}/${now.month}/${now.year} - $inspectorName - ${allPassed ? 'ผ่าน' : 'ไม่ผ่าน'}';
+        final historyData = {
+          'MachineID': widget.machine['MachineID'],
+          'เดือน': targetColumn,
+          'ประวัติ': historyString,
+        };
+        final historyUrl = 'https://script.google.com/macros/s/AKfycbwrVqV8e9mID-pIvX5dBhwPKCf0TLyuoAdTI0ff048-CEIlzvgXxdPOgRZ-hjwd4qvx/exec';
+        await http.post(
+          Uri.parse(historyUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(historyData),
+        );
+      } catch (e) {
+        // ไม่ต้องแจ้ง error ฝั่งประวัติ (กันแอปล่ม)
+      }
       if (response.statusCode == 200 || response.statusCode == 302) {
         try {
           final responseData = json.decode(response.body);

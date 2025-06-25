@@ -9,7 +9,7 @@ class PMSummaryTab extends StatefulWidget {
 }
 
 class _PMSummaryTabState extends State<PMSummaryTab> {
-  final String apiUrl = 'https://script.google.com/macros/s/AKfycbwN2FR1HCF-RbUF9FZUYQrtr3RcMSK8W-zrDJmcEU3AdmB7SlDcfM_NwjPhfCI1x-f4/exec';
+  final String apiUrl = 'https://script.google.com/macros/s/AKfycbwMmTsDyeIMEezM5LLYj-cfmWNkeJyR54ZuXvAHqKzcogXxNA-cPmwHG28PslNRDmcb/exec';
   static const String cacheKey = 'pm_summary_cache';
   static const String cacheTimeKey = 'pm_summary_cache_time';
   
