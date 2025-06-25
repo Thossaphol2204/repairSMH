@@ -23,7 +23,7 @@ class _RepairSummaryTabState extends State<RepairSummaryTab>
   // Constants
   static const Duration _cacheDuration = Duration(hours: 24);
   static const String _apiUrl =
-      'https://script.google.com/macros/s/AKfycbyK0vExuquR9feW5pb3I7h288YLvaWRGGKR44ev_FsxBjpoY7ivH-MlgcJPGizp_hAP/exec';
+      'https://script.google.com/macros/s/AKfycbxo4DJNNxidHRdd22TluoGZbI_-iNoRaFfwrBMoz04SEsAP5zEWlPkEIFYRcTobuNcf/exec';
 
   // Variables
   late Future<List<dynamic>> _futureData;

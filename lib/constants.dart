@@ -9,12 +9,6 @@ class AppConstants {
   static const Color errorColor = Colors.red;
   static const Color infoColor = Colors.blue;
 
-  // API URLs
-  static const String repairApiUrl = 'https://script.google.com/macros/s/AKfycby9hKrH-3JXWs4lwEyMwz38eaKiVG-Smykkmp37X1dA5-7BcY0jOQOgBZCPD_-0Ufmp/exec';
-  static const String workReportApiUrl = 'https://script.google.com/macros/s/AKfycbxujC8U32LqPBmd4aIuD1ssqt6fRR9KgxXVyQH-sovvUJqGGyBJR6LndzWy3eNexoKc3A/exec';
-  static const String pmApiUrl = 'https://script.google.com/macros/s/AKfycbyADlD2htbkvxYKp-D0eT416g3GTo1iAfVProwG3BVOUlsyGorMZLm7Kj1OhgcRoFSe/exec';
-  static const String authApiUrl = 'https://script.google.com/macros/s/AKfycbwCkuIkB0BokoHN6As3w4uvgd-jo8tZicRGR3p7vgp2xGKHRvY0Dazw7bT1FOogyNXydA/exec';
-
   // Text Styles
   static const TextStyle titleStyle = TextStyle(
     fontFamily: 'Kanit',

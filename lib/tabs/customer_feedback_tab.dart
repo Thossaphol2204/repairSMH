@@ -472,14 +472,15 @@ class _CustomerFeedbackTabState extends State<CustomerFeedbackTab>
                                 ),
                               ),
                             ),
-                          if (repair['ผู้แจ้ง'] != null)
+                          if (repair['ชื่อผู้แจ้ง'] != null)
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
                               child: Text(
-                                repair['ผู้แจ้ง'],
+                                'ผู้แจ้ง :  ${repair['ชื่อผู้แจ้ง']}',
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black54,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
                                   fontFamily: 'Kanit',
                                 ),
                               ),

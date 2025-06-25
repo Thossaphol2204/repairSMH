@@ -73,7 +73,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/icon/logo_SMH.png', width: 64, height: 64),
                   SizedBox(height: 8),
                   Text('SMH Repair App', style: TextStyle(color: Colors.white, fontFamily: 'Kanit', fontWeight: FontWeight.bold)),
                 ],
@@ -264,7 +263,6 @@ class _MainTechnicianTabScreenState extends State<MainTechnicianTabScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/icon/logo_SMH.png', width: 64, height: 64),
                   SizedBox(height: 8),
                   Text('SMH Repair App', style: TextStyle(color: Colors.white, fontFamily: 'Kanit', fontWeight: FontWeight.bold)),
                 ],
