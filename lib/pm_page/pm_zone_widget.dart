@@ -31,7 +31,7 @@ class _PMZoneWidgetState extends State<PMZoneWidget> with SingleTickerProviderSt
   DateTime? lastUpdate;
   String currentFilter = 'ทั้งหมด';
   
-  final Duration _cacheDuration = Duration(hours: 1);
+  final Duration _cacheDuration = Duration(hours: 24);
   DateTime? _lastFetchTime;
   SharedPreferences? _prefs;
 
