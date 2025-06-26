@@ -42,24 +42,6 @@ class AboutScreen extends StatelessWidget {
               style: TextStyle(fontFamily: 'Kanit', color: Colors.grey[800]),
             ),
             SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Contact', style: TextStyle(fontFamily: 'Kanit', fontWeight: FontWeight.bold, fontSize: 18, color: Colors.blue[800])),
-            ),
-            SizedBox(height: 10),
-            ListTile(
-              leading: Icon(Icons.email, color: Colors.blue[700]),
-              title: Text('support@smh.co.th', style: TextStyle(fontFamily: 'Kanit')),
-            ),
-            ListTile(
-              leading: Icon(Icons.phone, color: Colors.green[700]),
-              title: Text('02-123-4567', style: TextStyle(fontFamily: 'Kanit')),
-            ),
-            ListTile(
-              leading: Icon(Icons.chat, color: Colors.green[400]),
-              title: Text('Line: @smh_support', style: TextStyle(fontFamily: 'Kanit')),
-            ),
-            SizedBox(height: 24),
             Text('SMH © 2024', style: TextStyle(color: Colors.grey[500], fontFamily: 'Kanit')),
           ],
         ),
